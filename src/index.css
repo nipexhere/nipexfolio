@@ -1,0 +1,17 @@
+@import "tailwindcss";
+:root {
+  font-family: "Tagesschrift", system-ui;
+  font-optical-sizing: auto;
+  background: #333;
+  color: antiquewhite;
+  scroll-behavior: smooth;
+}
+.bg-image {
+  background-image: url("./assets/jason-root.webp");
+}
+
+#work, #about, #experience, #testimonials, #contact {
+  scroll-margin-top: 80px;
+
+}
+
