@@ -39,8 +39,8 @@ export const PROJECTS = [
     image: project1,
     description:
       "A Landing Page for a Gaming platform that connects Gamers from all around the World on thier favorite Games .",
-    technologies: ["React", "TailwindCss"],
-    link: "https://gamifyhub.vercel.app",
+    technologies: ["React", "TailwindCss, Framer-Motion"],
+    link: "https://gameefy.vercel.app",
   },
   {
     title: "TransPay Finance Hub",
