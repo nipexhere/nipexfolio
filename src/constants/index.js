@@ -1,70 +1,137 @@
-import project1 from "../assets/projects/Gamifylogo.png";
-import project2 from "../assets/projects/transpaylogo.png";
-import project3 from "../assets/projects/nipportlogo.png";
-import project4 from "../assets/projects/choplogo.png";
-
 export const HERO_CONTENT = {
-  greeting: "Hi Fam! 🖐️",
   introduction:
-    "I’m Nipex (Adebayo Oseni), a creative frontend developer, crafting immersive and intuitive web and mobile experiences.",
+    "I’m Nipex (Adebayo Oseni), a frontend developer and creative technologist building thoughtful web experiences, useful products, and playful experiments.",
   description:
-    "I’m currently helping businesses and organizations bring their visions to life through interactive digital solutions.",
+    "From React products and e-commerce to Python tools and Arduino experiments, I turn ideas into things people can use.",
   resumeLinkText: "Download Resume",
   resumeLink: "/AdebayoResume.pdf",
 };
 
-export const ABOUT_TEXT = `I am a dedicated and versatile front end developer with a passion for creating efficient and user-friendly web applications. With years of professional experience, I have worked with a variety of technologies, including React, JavaScript, TailwindCss, and React Native. My journey in web development began with a deep curiosity for how things work, and it has evolved into a career where I continuously strive to learn and adapt to new challenges. I thrive in collaborative environments and enjoy solving complex problems to deliver high-quality solutions. Outside of coding, I enjoy staying active, exploring new technologies, and contributing to open-source projects.`;
+export const ABOUT_TEXT = `I’m Adebayo Oseni, known as Nipex, a Lagos-based frontend developer who enjoys taking ideas from first sketch to working product. My work spans React applications, e-commerce, API and database integrations, and interactive 3D experiences. I also teach Python and Streamlit, Arduino programming, and small circuit building, bringing a practical hardware-repair mindset to solving technical problems. I’ve led and mentored learners, worked with clients, and built products with teams. I care about clear interfaces, reliable details, and making technology feel approachable.`;
 
 export const EXPERIENCES = [
   {
-    year: "Nov 2024 - Present",
-    role: "FrontEnd Developer",
-    company: "YE Network.",
-    description: `Led a team of Mentees in learning about web applications including HTML, CSS and React.js. consuming RESTful APIs and integrating with databases.`,
-    technologies: ["HTML", "CSS" , "Javascript", "React.js"],
+    year: "2026 - Present",
+    role: "Lead Frontend Engineer",
+    company: "Lexort",
+    description: "Leading development of a React-based legal case-filing platform. Translate Figma designs into responsive interfaces and build role-aware workflows for admins, judges, and clerks, integrating with backend APIs.",
+    technologies: ["React", "Vite", "REST APIs", "Figma"],
   },
   {
-    year: "March 2025 - Present",
-    role: "FrontEnd Developer intern",
-    company: "Skye Studio",
-    description: `Designed and developed user interfaces for web applications using React.JS and React Native. Worked closely with Senior developers. Implemented responsive designs and optimized frontend performance.`,
-    technologies: ["React JS", "React Native", "NativeWind"],
+    year: "May 2025 - 2026",
+    role: "Frontend / Web Developer",
+    company: "Crown Babies",
+    description: "Built and maintained a maternity, baby, and fashion e-commerce storefront. Customized WordPress pages with Elementor and configured WooCommerce products, categories, shipping, payments, and WhatsApp customer support.",
+    technologies: ["WordPress", "WooCommerce", "Elementor", "Cloudflare"],
   },
-  
+  {
+    year: "Jan 2026 - Present",
+    role: "Coding & Electronics Instructor",
+    company: "Independent",
+    description: "Teaching Python and Streamlit app development alongside Arduino programming and small circuit building, making coding concepts practical through hands-on projects.",
+    technologies: ["Python", "Streamlit", "Arduino", "Circuit building"],
+  },
+  {
+    year: "Oct 2025",
+    role: "Developer",
+    company: "Law Dinner Ticketing Platform",
+    description: "Built a React ticketing application with Supabase-backed ticket generation and an admin dashboard for managing the event.",
+    technologies: ["React", "Supabase", "Vite"],
+  },
+  {
+    year: "Dec 2025",
+    role: "Frontend Developer",
+    company: "Monoche",
+    description: "Designed and built a landing page for a friend's picturebook and photobook startup idea.",
+    technologies: ["React", "Responsive UI"],
+  },
+  {
+    year: "Aug 2025 - Nov 2025",
+    role: "Team Lead, Coding Mentorship",
+    company: "YE Network",
+    description: "Volunteered as a team lead in a mentorship program, coaching participants through coding exercises and professional development.",
+    technologies: ["Mentoring", "HTML", "CSS", "React"],
+  },
+  {
+    year: "2024 - 2025",
+    role: "Intern, Frontend Developer",
+    company: "Skye Studio",
+    description: "Developed and maintained responsive web and mobile applications with modern JavaScript frameworks, collaborating with senior developers.",
+    technologies: ["React", "React Native", "NativeWind"],
+  },
+  {
+    year: "May 2020 - Present",
+    role: "Mobile Hardware Engineer",
+    company: "Freelance",
+    description: "Diagnose and repair hardware issues in smartphones and tablets, bringing hands-on troubleshooting experience to my software work.",
+    technologies: ["Hardware diagnostics", "Repair"],
+  },
 ];
 
 export const PROJECTS = [
   {
-    title: "Gamify Hub",
-    image: project1,
-    description:
-      "A Landing Page for a Gaming platform that connects Gamers from all around the World on thier favorite Games .",
-    technologies: ["React", "TailwindCss, Framer-Motion"],
-    link: "https://gameefy.vercel.app",
+    title: "Casebook Studio",
+    mark: "CS",
+    type: "LEARNING TOOLS / LEGAL STUDY",
+    visual: "casebook",
+    description: "A focused Nigerian Law School study workspace for organizing searchable case briefs by course, practicing active recall, and tracking weekly study time. Casebooks and study logs can be backed up as JSON and CSV.",
+    technologies: ["Python", "Streamlit", "JSON / CSV"],
+    link: "https://casebookstudio.streamlit.app/",
+    sourceLink: "https://github.com/nipexhere/lawschoolstudy",
   },
   {
-    title: "TransPay Finance Hub",
-    image: project2,
-    description:
-      "A FinTech Landing Page website showcasing the Organizations Services and Products.",
-    technologies: ["HTML", "CSS", "Javascript"],
-    link: "https://transpayfinance.netlify.app",
+    title: "Northstar Capital",
+    mark: "N*",
+    type: "INDEPENDENT PROJECT / FINTECH",
+    visual: "northstar",
+    description: "An independent finance-focused web project built with React, backed by Neon, and deployed on Render.",
+    technologies: ["React", "Neon", "Render"],
+    link: "https://northstar-capital.onrender.com/",
   },
   {
-    title: " Nipex Portfolio Website",
-    image: project3,
-    description:
-      "A personal portfolio website showcasing projects, skills, and contact information and Animated using Framer Motion.",
-    technologies: ["React", "TailwindCss", "FramerMotion"],
+    title: "Crown Babies",
+    mark: "CB",
+    type: "CLIENT PROJECT / E-COMMERCE",
+    visual: "crown",
+    description: "A client e-commerce storefront for maternity, baby, and fashion products, with a tailored WooCommerce catalog and WhatsApp support.",
+    technologies: ["WordPress", "WooCommerce", "Elementor", "Cloudflare"],
+    link: "https://crownbabies.com",
+  },
+  {
+    title: "Law Dinner",
+    mark: "LD",
+    type: "EVENT TECH / TICKETING",
+    visual: "dinner",
+    description: "A dinner-event ticketing platform with ticket generation and an admin dashboard for event management.",
+    technologies: ["React", "Supabase", "Admin dashboard"],
+    link: "https://lawdinner.vercel.app",
+  },
+  {
+    title: "Monoche",
+    mark: "mo.",
+    type: "STARTUP CONCEPT / PICTUREBOOKS",
+    visual: "monoche",
+    description: "A landing page for a friend's picturebook and photobook startup idea, designed to introduce the concept with a clear, responsive web presence.",
+    technologies: ["React", "Responsive UI"],
+    link: "https://monoche.vercel.app",
+  },
+  {
+    title: "Nipex Portfolio",
+    mark: "N.",
+    type: "PERSONAL PROJECT / CREATIVE DEVELOPMENT",
+    visual: "portfolio",
+    description: "My evolving portfolio: an expressive React experience with an interactive Three.js sculpture and motion-led storytelling.",
+    technologies: ["React", "Three.js", "Framer Motion"],
     link: "https://nipexfolio.vercel.app",
   },
   {
-    title: "CHOP n CHAW Kitchens",
-    image: project4,
-    description:
-      "A Food Restaurant Kitchen Platform which showcases the Business and thier services. Allowing users to order food and drinks online",
-    technologies: ["HTML", "CSS", "Javascript"],
-    link: "https://chopnchaw.vercel.app",
+    title: "Lexort",
+    mark: "LX",
+    type: "LEGAL TECH / CASE FILING",
+    visual: "lexort",
+    description: "A legal case-filing platform with responsive interfaces and role-aware workflows for admins, judges, and clerks.",
+    technologies: ["React", "Vite", "REST APIs"],
+    link: "https://lexort-admin.vercel.app",
   },
 ];
 
