@@ -80,6 +80,15 @@ export const PROJECTS = [
     sourceLink: "https://github.com/nipexhere/lawschoolstudy",
   },
   {
+    title: "PexyDrop",
+    mark: "PD",
+    type: "PRIVATE FILE TRANSFER / FULL STACK",
+    visual: "pexydrop",
+    description: "A private, passphrase-protected file relay for moving files between paired devices. Includes QR-based pairing, support for large files, and a session-based transfer workflow.",
+    technologies: ["React 19", "TypeScript", "Vite 7", "Node.js 24", "Express 5", "Multer 2", "Archiver 7", "qrcode.react", "Lucide React"],
+    link: "https://pexydrop.onrender.com/",
+  },
+  {
     title: "Northstar Capital",
     mark: "N*",
     type: "INDEPENDENT PROJECT / FINTECH",

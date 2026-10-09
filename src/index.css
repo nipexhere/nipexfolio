@@ -133,6 +133,7 @@ a:focus-visible { outline: 2px solid var(--coral); outline-offset: 4px; }
 .project-poster::after { position: absolute; top: 0; right: 51px; width: 1px; height: 100%; background: currentColor; content: ''; opacity: 0.12; transform: rotate(22deg); }
 .project-poster-northstar { background: #e7d9f1; color: #472a65; }
 .project-poster-casebook { background: #eee0f6; color: #55336f; }
+.project-poster-pexydrop { background: #f5dfd9; color: #77384a; }
 .project-poster-crown { background: #f3e1e6; color: #6c2b43; }
 .project-poster-dinner { background: #ddd4ec; color: #39264d; }
 .project-poster-monoche { background: #f4e2d3; color: #713b2c; }
@@ -153,7 +154,8 @@ a:focus-visible { outline: 2px solid var(--coral); outline-offset: 4px; }
 .project-details { display: flex; min-height: 118px; flex-direction: column; justify-content: space-between; padding: 19px 1px 0; }
 .project-details h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.025em; }
 .project-details p { max-width: 475px; margin: 7px 0 0; color: #766b7c; font-size: 11px; line-height: 1.65; }
-.project-meta { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 17px; padding-top: 10px; border-top: 1px solid #d8cddd; color: #6d6274; font-family: var(--mono); font-size: 9px; }
+.project-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-top: 17px; padding-top: 10px; border-top: 1px solid #d8cddd; color: #6d6274; font-family: var(--mono); font-size: 9px; }
+.project-meta > span { min-width: 0; line-height: 1.7; }
 .project-meta svg { flex: 0 0 auto; color: var(--coral); font-size: 12px; transition: transform 180ms ease; }
 .project-card:hover .project-meta svg { transform: translateX(4px); }
 .experience-section { padding-block: 120px 125px; }
