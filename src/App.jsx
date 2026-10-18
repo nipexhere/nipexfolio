@@ -1,17 +1,15 @@
 import { createElement, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion as Motion, useReducedMotion } from 'framer-motion';
 import {
-  FaArrowDown,
   FaArrowRight,
   FaArrowUpRightFromSquare,
+  FaBolt,
   FaChevronDown,
   FaGithub,
   FaInstagram,
   FaLinkedin,
 } from 'react-icons/fa6';
 import { ABOUT_TEXT, CONTACT, EXPERIENCES, HERO_CONTENT, PROJECTS } from './constants';
-import portrait from './assets/Adebayo.png';
-import AmbientBackground from './components/AmbientBackground';
 import OrbitalScene from './components/OrbitalScene';
 
 const socialLinks = [
@@ -63,27 +61,13 @@ const skillGroups = [
   },
 ];
 
-const tickerSkills = skillGroups.flatMap(({ skills: groupSkills }) => groupSkills.map(({ name }) => name));
-
-function Reveal({ children, className = '', delay = 0 }) {
-  const reduceMotion = useReducedMotion();
-
-  return createElement(motion.div, {
-    className,
-    initial: { opacity: 0, y: reduceMotion ? 0 : 28 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: '-72px' },
-    transition: { duration: reduceMotion ? 0 : 0.65, delay, ease: [0.22, 1, 0.36, 1] },
-  }, children);
+function Reveal({ children, className = '' }) {
+  return <div className={className}>{children}</div>;
 }
 
-function SectionLabel({ number, children }) {
+function SectionLabel({ children }) {
   return (
-    <div className="section-label">
-      <span>{number}</span>
-      <span className="section-label-line" />
-      <span>{children}</span>
-    </div>
+    <p className="section-label">{children}</p>
   );
 }
 
@@ -117,7 +101,7 @@ function SkillsShowcase() {
       </div>
 
       <AnimatePresence initial={false} mode="wait">
-        <motion.div
+        <Motion.div
           animate={{ opacity: 1, y: 0 }}
           className="skills-stage"
           exit={{ opacity: 0, y: -8 * movement }}
@@ -126,14 +110,14 @@ function SkillsShowcase() {
           transition={{ duration: 0.28 }}
         >
           <p className="skill-group-description">{activeGroup.description}</p>
-          <motion.div
+          <Motion.div
             animate="visible"
             className="skill-list"
             initial="hidden"
             variants={{ visible: { transition: { staggerChildren: 0.045 * movement } } }}
           >
             {activeGroup.skills.map((skill, index) => (
-              <motion.button
+              <Motion.button
                 animate="visible"
                 aria-pressed={activeSkill.name === skill.name}
                 className="skill-chip"
@@ -149,11 +133,11 @@ function SkillsShowcase() {
                 type="button"
               >
                 {skill.name}
-              </motion.button>
+              </Motion.button>
             ))}
-          </motion.div>
+          </Motion.div>
           <AnimatePresence initial={false} mode="wait">
-            <motion.div
+            <Motion.div
               animate={{ opacity: 1, y: 0 }}
               aria-live="polite"
               className="skill-detail"
@@ -162,12 +146,12 @@ function SkillsShowcase() {
               key={activeSkill.name}
               transition={{ duration: 0.2 }}
             >
-              <span className="skill-detail-label">SELECTED TOOL</span>
+              <span className="skill-detail-label">Selected tool</span>
               <strong>{activeSkill.name}</strong>
               <p>{activeSkill.detail}</p>
-            </motion.div>
+            </Motion.div>
           </AnimatePresence>
-        </motion.div>
+        </Motion.div>
       </AnimatePresence>
     </div>
   );
@@ -176,18 +160,20 @@ function SkillsShowcase() {
 function App() {
   const [experienceOpen, setExperienceOpen] = useState(false);
   const [expandedExperience, setExpandedExperience] = useState(null);
+  const [activeProjectFilter, setActiveProjectFilter] = useState('all');
+  const [scenePulse, setScenePulse] = useState(0);
   const reduceMotion = useReducedMotion();
   const accordionDuration = reduceMotion ? 0 : 0.42;
   const toggleDuration = reduceMotion ? 0 : 0.3;
   const detailDuration = reduceMotion ? 0 : 0.3;
+  const visibleProjects = PROJECTS.filter((project) => activeProjectFilter === 'all' || project.category === activeProjectFilter);
 
   return (
     <div className="site-shell">
-      <AmbientBackground />
       <header className="site-header page-wrap">
         <a className="wordmark" href="#home" aria-label="Nipex, back to top">
-          <span className="wordmark-icon">N.</span>
-          <span className="wordmark-name">NIPEX<span>®</span></span>
+          <span className="wordmark-icon">N</span>
+          <span className="wordmark-name">Nipex</span>
         </a>
         <nav className="header-nav" aria-label="Main navigation">
           <a href="#work">Work</a>
@@ -197,61 +183,71 @@ function App() {
         </nav>
         <a className="availability" href={`mailto:${CONTACT.email}`}>
           <span className="availability-dot" />
-          <span>Available for select projects</span>
+          <span>Open to select projects</span>
         </a>
       </header>
 
       <main>
-        <section className="hero page-wrap" id="home">
-          <div className="hero-copy">
-            <div className="eyebrow"><span>INDEPENDENT DEVELOPER</span><span className="eyebrow-dot">/</span><span>LAGOS, NG</span></div>
-            <h1>Adebayo<br /><span>Oseni.</span></h1>
-            <p className="hero-role">Frontend developer <span>+</span> creative technologist</p>
-            <p className="hero-intro">I build thoughtful web products, from React platforms and online stores to interactive Three.js experiments. Curious by nature, practical by default.</p>
-            <div className="hero-actions">
-              <a className="button button-dark" href="#work">Explore my work <FaArrowDown aria-hidden="true" /></a>
-              <a className="text-link" href={`mailto:${CONTACT.email}`}>Let's talk <FaArrowUpRightFromSquare aria-hidden="true" /></a>
+          <section className="hero" id="home">
+            <div className="hero-visual">
+              <OrbitalScene pulseKey={scenePulse} />
             </div>
-            <div className="hero-socials" aria-label="Social links">
-              {socialLinks.map(({ label, href, icon: Icon }) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
-                  {createElement(Icon, { 'aria-hidden': true })}
-                </a>
-              ))}
-              <span className="social-note">Find me around the web</span>
+            <div className="hero-inner page-wrap">
+              <div className="hero-copy">
+                <p className="eyebrow">Digital products, made with intent</p>
+                <h1>Adebayo<br />Oseni<span className="hero-period">.</span></h1>
+                <p className="hero-role">Frontend engineer &amp; creative technologist</p>
+                <p className="hero-intro">From role-aware legal workflows to private file transfer and hands-on electronics, I turn complex ideas into experiences that feel simple.</p>
+                <div className="hero-actions">
+                  <a className="button button-dark" href="#work">See what I build <FaArrowRight aria-hidden="true" /></a>
+                  <a className="text-link" href={`mailto:${CONTACT.email}`}>Start a conversation <FaArrowUpRightFromSquare aria-hidden="true" /></a>
+                </div>
+                <div className="hero-socials" aria-label="Social links">
+                  {socialLinks.map(({ label, href, icon: Icon }) => (
+                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
+                      {createElement(Icon, { 'aria-hidden': true })}
+                    </a>
+                  ))}
+                  <span className="social-note">Lagos, Nigeria</span>
+                </div>
+              </div>
+              <div className="hero-location">
+                <span>06° 27' N</span>
+                <span>03° 23' E</span>
+              </div>
+              <button
+                aria-label="Pulse the circuit sculpture"
+                className="scene-pulse"
+                onClick={() => setScenePulse((current) => current + 1)}
+                title="Send a pulse through the circuit"
+                type="button"
+              >
+                <FaBolt aria-hidden="true" />
+                <span>Pulse signal</span>
+              </button>
             </div>
-          </div>
+            <div className="hero-bottom-note"><span>Selected work follows</span><span className="hero-bottom-line" /></div>
+          </section>
 
-          <div className="hero-art-wrap">
-            <div className="hero-art" aria-label="Portrait of Adebayo Oseni with an interactive 3D orbital sculpture">
-              <OrbitalScene />
-              <img className="hero-portrait" src={portrait} alt="Adebayo Oseni, frontend developer" />
-              <div className="art-index">FIG. 01 <span>THE BUILDER</span></div>
-              <div className="art-caption"><span className="art-caption-mark">N</span><span>Curiosity,<br />made tangible.</span></div>
-              <div className="art-coordinate">06° 27' N<br />03° 23' E</div>
-            </div>
-            <div className="art-side-note"><span /> DESIGNING FROM LAGOS, BUILDING FOR EVERYWHERE</div>
-          </div>
-          <div className="hero-bottom-note"><span>SCROLL TO EXPLORE</span><span className="hero-bottom-line" /></div>
-        </section>
-
-        <div className="ticker" aria-label="Tools and technologies">
-          <div className="ticker-track">
+        <div className="discipline-marquee" role="group" aria-label="Areas of work">
+          <div className="discipline-track">
             {[0, 1].map((copy) => (
-              <div className="ticker-group" key={copy} aria-hidden={copy === 1}>
-                {tickerSkills.map((skill) => <span className="ticker-item" key={`${copy}-${skill}`}>{skill}<i>✳</i></span>)}
+              <div aria-hidden={copy === 1} className="discipline-group" key={copy}>
+                <span>Digital products</span>
+                <span>Teaching and mentorship</span>
+                <span>Code and circuits</span>
               </div>
             ))}
           </div>
         </div>
 
         <section className="about-section page-wrap" id="about">
-          <SectionLabel number="01">A LITTLE ABOUT ME</SectionLabel>
+          <SectionLabel>A little about me</SectionLabel>
           <div className="about-grid">
             <Reveal>
-              <h2>Good code is<br />felt, <span>not just seen.</span></h2>
+              <h2>Make it clear.<br />Make it <span>work.</span></h2>
             </Reveal>
-            <Reveal delay={0.12}>
+            <Reveal>
               <p className="about-copy">{ABOUT_TEXT}</p>
               <a className="resume-link" href={HERO_CONTENT.resumeLink} target="_blank" rel="noreferrer">
                 A little more about my journey <FaArrowUpRightFromSquare aria-hidden="true" />
@@ -260,7 +256,7 @@ function App() {
           </div>
           <div className="skills-row">
             <div className="skills-intro">
-              <span className="skills-heading">MY EVERYDAY TOOLKIT</span>
+              <span className="skills-heading">What I work with</span>
               <p>From pixels and products to Python and physical builds.</p>
             </div>
             <SkillsShowcase />
@@ -269,30 +265,54 @@ function App() {
 
         <section className="work-section" id="work">
           <div className="page-wrap">
-            <SectionLabel number="02">SELECTED WORK</SectionLabel>
+            <SectionLabel>Selected work</SectionLabel>
             <div className="section-heading-row">
-              <Reveal><h2>Ideas, meet<br /><span>the internet.</span></h2></Reveal>
-              <p className="section-aside">Independent ideas, client builds, and product work, from e-commerce and event tech to legal platforms and interactive 3D.</p>
+              <Reveal><h2>Useful things,<br /><span>made real.</span></h2></Reveal>
+              <p className="section-aside">A selection of products, client builds, and experiments across commerce, legal tech, education, and event tools.</p>
+            </div>
+            <div className="project-filter-row">
+              <div className="project-filters" role="group" aria-label="Filter projects">
+                {[
+                  { label: 'Everything', value: 'all' },
+                  { label: 'Products', value: 'product' },
+                  { label: 'Client work', value: 'client' },
+                  { label: 'Experiments', value: 'experiment' },
+                ].map((filter) => (
+                  <button
+                    aria-pressed={activeProjectFilter === filter.value}
+                    className="project-filter"
+                    key={filter.value}
+                    onClick={() => setActiveProjectFilter(filter.value)}
+                    type="button"
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+              <span className="project-count">{visibleProjects.length} projects</span>
             </div>
             <div className="project-grid">
-              {PROJECTS.map((project, index) => (
-                <Reveal key={project.title} delay={(index % 2) * 0.1} className={`project-reveal project-reveal-${index + 1}`}>
-                  <a className={`project-card project-card-${index + 1}`} href={project.link} target="_blank" rel="noreferrer">
-                    <div className="project-visual">
-                      <span className="project-number">0{index + 1} / 0{PROJECTS.length}</span>
-                      <span className={`project-poster project-poster-${project.visual}`} aria-hidden="true">
-                        <span className="poster-mark">{project.mark}</span>
-                        <span className="poster-title">{project.title}</span>
-                        <span className="poster-type">{project.type}</span>
-                      </span>
-                      <span className="project-open" aria-label={`Open ${project.title}`}><FaArrowUpRightFromSquare aria-hidden="true" /></span>
-                      <span className="project-visual-caption">LIVE PROJECT <i>↗</i></span>
+              {visibleProjects.map((project, index) => (
+                <Reveal key={project.title} className={`project-reveal project-reveal-${index + 1}`}>
+                  <article className={`project-card project-card-${index + 1}`}>
+                    <div className="project-preview">
+                      <iframe
+                        className="project-iframe"
+                        loading="lazy"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        src={project.link}
+                        title={`${project.title.trim()} live website preview`}
+                      />
+                      <a className="project-preview-link" href={project.link} target="_blank" rel="noreferrer">
+                        <span>Visit live site</span>
+                        <FaArrowUpRightFromSquare aria-hidden="true" />
+                      </a>
                     </div>
                     <div className="project-details">
                       <div><h3>{project.title.trim()}</h3><p>{project.description}</p></div>
-                      <div className="project-meta"><span>{project.technologies.join(' · ')}</span><FaArrowRight aria-hidden="true" /></div>
+                      <div className="project-meta"><span>{project.technologies.join(', ')}</span><FaArrowRight aria-hidden="true" /></div>
                     </div>
-                  </a>
+                  </article>
                   {project.sourceLink && (
                     <a className="project-source" href={project.sourceLink} target="_blank" rel="noreferrer">
                       <FaGithub aria-hidden="true" /> View source code <FaArrowUpRightFromSquare aria-hidden="true" />
@@ -305,10 +325,10 @@ function App() {
         </section>
 
         <section className="experience-section page-wrap" id="experience">
-          <SectionLabel number="03">THE JOURNEY SO FAR</SectionLabel>
+          <SectionLabel>A few chapters</SectionLabel>
           <div className="experience-heading">
-            <Reveal><h2>Learning by<br /><span>making.</span></h2></Reveal>
-            <p>Good work comes from good people. Here are a few chapters along the way.</p>
+            <Reveal><h2>Learn by<br /><span>making.</span></h2></Reveal>
+            <p>Product work, teaching, and hands-on problem solving have all shaped how I build.</p>
           </div>
           <button
             aria-controls="experience-list"
@@ -324,13 +344,13 @@ function App() {
               <strong>{experienceOpen ? 'Close experience' : 'Explore experience'}</strong>
               <span>{String(EXPERIENCES.length).padStart(2, '0')} roles across product development, teaching, and hardware</span>
             </span>
-            <motion.span animate={{ rotate: experienceOpen ? 180 : 0 }} aria-hidden="true" className="experience-disclosure-icon" transition={{ duration: toggleDuration, ease: [0.22, 1, 0.36, 1] }}>
+            <Motion.span animate={{ rotate: experienceOpen ? 180 : 0 }} aria-hidden="true" className="experience-disclosure-icon" transition={{ duration: toggleDuration, ease: [0.22, 1, 0.36, 1] }}>
               <FaChevronDown />
-            </motion.span>
+            </Motion.span>
           </button>
           <AnimatePresence initial={false}>
             {experienceOpen && (
-              <motion.div
+              <Motion.div
                 animate={{ height: 'auto', opacity: 1, y: 0 }}
                 className="experience-list"
                 exit={{ height: 0, opacity: 0, y: -10 }}
@@ -348,7 +368,6 @@ function App() {
                       <div className="experience-entry">
                         <p className="experience-date">{experience.year}</p>
                         <div className="experience-detail">
-                          <span className="experience-index">{String(index + 1).padStart(2, '0')}</span>
                           <div>
                             <button
                               aria-controls={detailsId}
@@ -358,14 +377,14 @@ function App() {
                               type="button"
                             >
                               <span>{experience.role}</span>
-                              <motion.span animate={{ rotate: isExpanded ? 180 : 0 }} aria-hidden="true" className="experience-toggle-icon" transition={{ duration: reduceMotion ? 0 : 0.24 }}>
+                              <Motion.span animate={{ rotate: isExpanded ? 180 : 0 }} aria-hidden="true" className="experience-toggle-icon" transition={{ duration: reduceMotion ? 0 : 0.24 }}>
                                 <FaChevronDown />
-                              </motion.span>
+                              </Motion.span>
                             </button>
                             <p className="experience-company">{experience.company}</p>
                             <AnimatePresence initial={false}>
                               {isExpanded && (
-                                <motion.div
+                                <Motion.div
                                   animate={{ height: 'auto', opacity: 1, y: 0 }}
                                   className="experience-more"
                                   exit={{ height: 0, opacity: 0, y: -6 }}
@@ -376,7 +395,7 @@ function App() {
                                 >
                                   <p className="experience-description">{experience.description}</p>
                                   <div className="experience-tags">{experience.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div>
-                                </motion.div>
+                                </Motion.div>
                               )}
                             </AnimatePresence>
                           </div>
@@ -385,20 +404,20 @@ function App() {
                     </article>
                   );
                 })}
-              </motion.div>
+              </Motion.div>
             )}
           </AnimatePresence>
         </section>
 
         <section className="contact-section" id="contact">
           <div className="contact-inner page-wrap">
-            <SectionLabel number="04">YOUR MOVE</SectionLabel>
+            <SectionLabel>Start a conversation</SectionLabel>
             <Reveal>
-              <h2>Have a good<br /><span>one in mind?</span></h2>
-              <p>Have a project, a big idea, or just want to talk good design? My inbox is open.</p>
-              <a className="button button-light" href={`mailto:${CONTACT.email}`}>Start a conversation <FaArrowUpRightFromSquare aria-hidden="true" /></a>
+              <h2>What are you<br /><span>working on?</span></h2>
+              <p>Have a product to shape, a problem to solve, or a practical idea worth testing? Let’s talk.</p>
+              <a className="button button-light" href={`mailto:${CONTACT.email}`}>Email Adebayo <FaArrowUpRightFromSquare aria-hidden="true" /></a>
             </Reveal>
-            <span className="contact-stamp" aria-hidden="true">LET'S<br />MAKE<br />SOMETHING<br />MATTER.</span>
+            <span className="contact-stamp" aria-hidden="true">N.</span>
           </div>
         </section>
       </main>
