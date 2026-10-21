@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 function OrbitalScene({ pulseKey = 0 }) {
   const canvasRef = useRef(null);
@@ -27,7 +32,14 @@ function OrbitalScene({ pulseKey = 0 }) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
 
-    scene.add(new THREE.AmbientLight(0xd5a7df, 1.2));
+    // Image-based lighting: a blurred studio environment gives the physical
+    // materials real reflections instead of flat, single-colour shading.
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    const environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = environment;
+    scene.environmentIntensity = 0.22;
+
+    scene.add(new THREE.AmbientLight(0xd5a7df, 0.35));
     const keyLight = new THREE.PointLight(0xff873a, 42, 16);
     keyLight.position.set(2.8, 2.4, 3.5);
     scene.add(keyLight);
@@ -38,9 +50,24 @@ function OrbitalScene({ pulseKey = 0 }) {
     const sculpture = new THREE.Group();
     scene.add(sculpture);
 
+    // A faceted, lacquered crystal: clearcoat catches sharp highlights and
+    // iridescence shifts the facets between purple and orange as it turns.
     const core = new THREE.Mesh(
       new THREE.IcosahedronGeometry(1.13, 2),
-      new THREE.MeshBasicMaterial({ color: 0x8c45b8 }),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x8c45b8,
+        emissive: 0x3a1450,
+        metalness: 0.2,
+        roughness: 0.34,
+        clearcoat: 1,
+        clearcoatRoughness: 0.2,
+        iridescence: 0.7,
+        iridescenceIOR: 1.4,
+        iridescenceThicknessRange: [180, 520],
+        sheen: 0.25,
+        sheenColor: new THREE.Color(0xff873a),
+        flatShading: true,
+      }),
     );
     sculpture.add(core);
 
@@ -65,6 +92,7 @@ function OrbitalScene({ pulseKey = 0 }) {
     sculpture.add(orbitTwo);
 
     const traceNodes = [];
+    const signals = [];
     const traces = [
       { points: [[1.2, 1.25, 0.05], [1.85, 1.25, 0.05], [1.85, 0.72, 0.05], [2.55, 0.72, 0.05]], color: 0xff873a },
       { points: [[-1.15, -1.15, 0.1], [-1.95, -1.15, 0.1], [-1.95, -0.48, 0.1], [-2.6, -0.48, 0.1]], color: 0x8c45b8 },
@@ -85,6 +113,17 @@ function OrbitalScene({ pulseKey = 0 }) {
       node.position.copy(curve.getPoint(1));
       sculpture.add(node);
       traceNodes.push(node);
+
+      // A bright packet of "current" that runs from the core out along the trace.
+      const signal = new THREE.Mesh(
+        new THREE.SphereGeometry(0.035, 12, 8),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(2.4), transparent: true }),
+      );
+      signal.userData.curve = curve;
+      signal.userData.progress = Math.random();
+      signal.position.copy(curve.getPoint(signal.userData.progress));
+      sculpture.add(signal);
+      signals.push(signal);
     });
 
     const satelliteMeshes = [];
@@ -124,6 +163,15 @@ function OrbitalScene({ pulseKey = 0 }) {
     );
     scene.add(particles);
 
+    // Bloom makes the bright parts (traces, nodes, signals, wireframe) glow the
+    // way light does on a lens, which sells the "live circuit" feel.
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.65, 0.5, 0.8);
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+    const render = () => composer.render();
+
     const pointer = new THREE.Vector2(0, 0);
     const target = new THREE.Vector2(0, 0);
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -135,14 +183,14 @@ function OrbitalScene({ pulseKey = 0 }) {
       if (prefersReducedMotion) {
         sculpture.rotation.y = target.x * 0.36;
         sculpture.rotation.x = target.y * 0.24;
-        renderer.render(scene, camera);
+        render();
       }
     };
     const resetPointer = () => {
       target.set(0, 0);
       if (prefersReducedMotion) {
         sculpture.rotation.set(0, 0, 0);
-        renderer.render(scene, camera);
+        render();
       }
     };
     const handlePointerDown = () => {
@@ -150,7 +198,7 @@ function OrbitalScene({ pulseKey = 0 }) {
       if (prefersReducedMotion) {
         core.scale.setScalar(1.1);
         orbit.material.opacity = 1;
-        renderer.render(scene, camera);
+        render();
       }
     };
     pulseHandlerRef.current = handlePointerDown;
@@ -177,14 +225,18 @@ function OrbitalScene({ pulseKey = 0 }) {
       sculpture.position.set(0, 0, 0);
 
       renderer.setSize(width, height, false);
-      if (prefersReducedMotion) renderer.render(scene, camera);
+      composer.setPixelRatio(renderer.getPixelRatio());
+      composer.setSize(width, height);
+      if (prefersReducedMotion) render();
     });
     resizeObserver.observe(canvas.parentElement);
 
     let frameId;
+    let running = false;
     const timer = new THREE.Timer();
     timer.connect(document);
     const animate = (timestamp) => {
+      if (!running) return;
       frameId = window.requestAnimationFrame(animate);
       timer.update(timestamp);
       const elapsed = timer.getElapsed();
@@ -199,6 +251,13 @@ function OrbitalScene({ pulseKey = 0 }) {
         const phase = elapsed * 3.2 + index * 2.1;
         node.scale.setScalar(0.85 + (Math.sin(phase) + 1) * 0.24 + interactionPulse * 0.35);
       });
+      signals.forEach((signal, index) => {
+        const { curve } = signal.userData;
+        signal.userData.progress = (signal.userData.progress + delta * (0.32 + index * 0.05 + interactionPulse * 1.6)) % 1;
+        signal.position.copy(curve.getPoint(signal.userData.progress));
+        signal.material.opacity = Math.sin(signal.userData.progress * Math.PI);
+      });
+      bloomPass.strength = 0.65 + interactionPulse * 0.6;
       core.rotation.set(elapsed * 0.1, elapsed * 0.13, elapsed * 0.06);
       wire.rotation.set(-elapsed * 0.07, elapsed * 0.04, elapsed * 0.08);
       orbit.rotation.z = elapsed * 0.11;
@@ -208,12 +267,25 @@ function OrbitalScene({ pulseKey = 0 }) {
         satellite.rotation.y = elapsed * 0.42;
       });
       particles.rotation.y = -elapsed * 0.012;
-      renderer.render(scene, camera);
+      render();
     };
-    if (prefersReducedMotion) renderer.render(scene, camera);
-    else animate();
+    // Only spend frames on the sculpture while it is on screen.
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      if (prefersReducedMotion) return;
+      if (entry.isIntersecting && !running) {
+        running = true;
+        frameId = window.requestAnimationFrame(animate);
+      } else if (!entry.isIntersecting) {
+        running = false;
+        window.cancelAnimationFrame(frameId);
+      }
+    });
+    visibilityObserver.observe(canvas);
+    if (prefersReducedMotion) render();
 
     return () => {
+      running = false;
+      visibilityObserver.disconnect();
       window.cancelAnimationFrame(frameId);
       pulseHandlerRef.current = () => {};
       resizeObserver.disconnect();
@@ -226,6 +298,10 @@ function OrbitalScene({ pulseKey = 0 }) {
         if (Array.isArray(object.material)) object.material.forEach((material) => material.dispose());
         else object.material?.dispose();
       });
+      bloomPass.dispose();
+      composer.dispose();
+      environment.dispose();
+      pmremGenerator.dispose();
       renderer.dispose();
     };
   }, []);
@@ -234,11 +310,10 @@ function OrbitalScene({ pulseKey = 0 }) {
     if (pulseKey > 0) pulseHandlerRef.current();
   }, [pulseKey]);
 
-  // Sizing is handled with Tailwind so it no longer depends on separate CSS.
-  // The parent decides the height; the canvas fills it.
+  // The parent decides the size; the canvas fills it.
   return (
-    <div className="orbital-scene relative h-full w-full">
-      <canvas className="orbital-canvas absolute inset-0 block h-full w-full" ref={canvasRef} aria-hidden="true" />
+    <div className="orbital-scene">
+      <canvas className="orbital-canvas" ref={canvasRef} aria-hidden="true" />
     </div>
   );
 }
